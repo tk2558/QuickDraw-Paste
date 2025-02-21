@@ -1,0 +1,20 @@
+{
+    "manifest_version": 3,
+    "name": "QuickDraw Paste",
+    "description": "A Chrome extension to quickly store information to be copy and pasted",
+    "version": "1.0",
+    "permissions": ["storage"],
+    "action": {
+      "default_popup": "popup/popup.html",
+      "default_icon": "/assets/tumbleweed.png"
+    },
+    "background": {
+      "service_worker": "background.js"
+    },
+    "icons": {
+      "16": "/assets/tumbleweed.png",
+      "48": "/assets/tumbleweed.png",
+      "128": "/assets/tumbleweed.png"
+    }
+  }
+  

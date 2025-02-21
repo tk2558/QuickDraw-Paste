@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Section</title>
+    <link rel="stylesheet" href="add_section.css"> <!-- Link to external CSS -->
+</head>
+<body>
+    <div class="popup-container">
+        <div class="header">
+            <img src="../assets/revolver.png" alt="Revolver Icon" class="header-icon">
+            <h2>Add Section</h2>
+        </div>
+
+        <!-- Name Section (Label & Input in the Same Line) -->
+        <div class="name-section">
+            <label for="section-name">Name Section:</label>
+            <input type="text" class="name-section" id="name-section" placeholder="Enter name">
+        </div>
+
+        <!-- Multiline Checkbox -->
+        <div class="checkbox-group">
+            <input type="checkbox" id="toggle-checkbox" checked>
+            <label for="toggle-checkbox" class="toggle">
+                <div class="line line--top"></div>
+                <div class="line line--middle"></div>
+                <div class="line line--bottom"></div>
+            </label>
+            <span id="format" class="format">Single-Line Format</span>
+        </div>
+
+        <div class="password-group">
+            <input type="checkbox" id="inpLock">
+            <label class="btn-lock" for="inpLock">
+                <svg width="26" height="30" viewBox="0 0 29 48">
+                    <path class="lockb" d="M27 27C27 34.1797 21.1797 40 14 40C6.8203 40 1 34.1797 1 27C1 19.8203 6.8203 14 14 14C21.1797 14 27 19.8203 27 27ZM15.6298 26.5191C16.4544 25.9845 17 25.056 17 24C17 22.3431 15.6569 21 14 21C12.3431 21 11 22.3431 11 24C11 25.056 11.5456 25.9845 12.3702 26.5191L11 32H17L15.6298 26.5191Z"></path>
+                    <path class="lock" d="M6 21V10C6 5.58172 9.58172 2 14 2V2C18.4183 2 22 5.58172 22 10V21"></path>
+                </svg>
+            </label>
+            <div class="password-container">
+                <input type="password" id="password" class="lock-password-input" placeholder="Enter password" disabled>        
+                <button type="button" class="toggle-visibility-btn" disabled>
+                    <img src="../assets/eye.png" alt="Show password" class="eye-icon">
+                </button>
+            </div>
+        </div>
+
+        <!-- Buttons -->
+        <div class="button-group">
+            <button class="cancel-btn">Cancel</button>
+            <button class="save-btn">Save</button>
+        </div>
+    </div>
+<script src="add_section.js"></script>
+</body>
+</html>
