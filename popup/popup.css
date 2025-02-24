@@ -52,7 +52,13 @@ h2 {
   margin-left: auto; 
   border: none;
   cursor: pointer;
-  margin-right: 5px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 5px;  
+  width: 24px; /* Explicit width */
+  height: 24px; /* Explicit height */
+  line-height: 1; /* Prevent extra spacing */
 }
 
 .delete-sec-btn {  
@@ -198,7 +204,8 @@ button, .add-entry-btn, .add-entry-btn-long {
   border-radius: 3px;
   color: white;
   font-weight: bold;
-  width: 70px;
+  width: 65px;
+  margin-right: 5px;
 }
 
 .edit-btn, .delete-btn, .copy-btn, .confirm-btn {

@@ -64,7 +64,8 @@ function unlockSection(section, sectionId) {
     const lockBtn = section.querySelector(".lock-btn")
     lockBtn.textContent = "🔓";
 
-    addEntryBtn.style.visibility = "visible";    
+    addEntryBtn.style.visibility = "visible";
+    addEntryBtn.style.display = "block"; 
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button
         createEntry(sectionContent, addEntryBtn , section.dataset.format);
     });
@@ -137,6 +138,7 @@ function relockSection(section) {
 
     const addEntryBtn = section.querySelector(".add-entry-btn") ?? section.querySelector(".add-entry-btn-long");
     addEntryBtn.style.visibility = "hidden";
+    addEntryBtn.style.display = "none"; 
     section.dataset.status = true;  // unlocked status
 }
 

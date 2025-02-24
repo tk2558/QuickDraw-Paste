@@ -76,10 +76,12 @@ function restoreSections(sectionData) {
     });
     
     const addEntryBtn = newSection.querySelector(".add-entry-btn") ??  newSection.querySelector(".add-entry-btn-long");
-    sectionData.entries.forEach((entry) => // Restore Entries
+    sectionData.entries.forEach((entry) => { // Restore Entries
+        const sectionContent = newSection.querySelector(".section-content");
         restoreEntry(sectionContent, addEntryBtn , entry.name, entry.text, sectionData.format)
-    ); 
+    }); 
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button (Multi Line Version)
+        const sectionContent = newSection.querySelector(".section-content");
         createEntry(sectionContent, addEntryBtn , sectionData.format);
     });
     if (!sectionData.entries.length) {  newSection.querySelector('.section-content').classList.toggle('hidden'); }
@@ -191,7 +193,8 @@ function restoreLocked(sectionData) {
     const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");
     newSection.querySelector('.section-content').classList.toggle('hidden');
     newSection.querySelector('.locked-section').classList.toggle('hidden');
-    addEntryBtn.style.visibility = "hidden"; // Make Btn Appear
+    addEntryBtn.style.visibility = "hidden"; 
+    addEntryBtn.style.display = "none"; 
     //saveSections();
 }
 

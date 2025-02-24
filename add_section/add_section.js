@@ -30,6 +30,100 @@ async function encryptPassword(password, key) {
     };
 }
 
+document.addEventListener('DOMContentLoaded', function () {
+    const toggleFormat = document.getElementById("toggle-checkbox");
+    toggleFormat.addEventListener("change", function() {
+        const label = document.querySelector(".format");
+        if (toggleFormat.checked) {
+            label.textContent = "Single-Line Format"; // If checked, change the label text to "Single Line"
+        } 
+        else {
+            label.textContent = "Multi-Line Format"; // If not checked, change the label text to "Multiline"
+        }
+    });
+
+    const lockCheckbox = document.getElementById("inpLock");
+    const passwordInput = document.getElementById("password");
+    const toggleButton = document.querySelector('.toggle-visibility-btn');
+    const eyeIcon = document.querySelector('.eye-icon');
+
+    lockCheckbox.addEventListener("change", function () {
+        passwordInput.disabled = !this.checked;
+        toggleButton.disabled = !this.checked;
+        passwordInput.value = "";
+        passwordInput.style.backgroundColor = this.checked ? "white" : "#e0e0e0";
+    });
+
+    // Add event listener to toggle visibility
+    toggleButton.addEventListener('click', () => { // Toggle the input type between password and text
+        if (passwordInput.type === 'password') {
+            eyeIcon.src = "../assets/hidden.png";
+            passwordInput.type = 'text';
+        } 
+        else {
+            eyeIcon.src = "../assets/eye.png";
+            passwordInput.type = 'password';
+        }
+    });
+
+    const cancelButton = document.querySelector('.cancel-btn');
+    cancelButton.addEventListener('click', function () {
+        window.close();
+    });
+
+    const addButton = document.querySelector('.save-btn');
+    addButton.addEventListener("click", async () => {
+        const sectionNameInput = document.getElementById("name-section");
+        const lineCheckbox = document.getElementById("toggle-checkbox") // Single Line = True, MultiLine = False
+        const lockCheckbox = document.getElementById("inpLock");
+        const passwordInput = document.querySelector(".lock-password-input");
+    
+        // Get values
+        const oneLine = lineCheckbox.checked;
+        const isLocked = lockCheckbox.checked;
+    
+        if (!sectionNameInput.value.trim() || (isLocked && !passwordInput.value.trim())) {
+            addButton .classList.add("shake");
+            setTimeout(() => {
+                addButton.classList.remove("shake");
+            }, 300);
+            return;
+        }
+    
+        const format = oneLine ? "single-line" : "multi-line";
+        const password = isLocked ? passwordInput.value : null
+        const sectionId = `section-${Date.now()}`; // Generate unique ID 
+        
+        const sectionData = {
+            id: sectionId,
+            sectionName: sectionNameInput.value,
+            format: format,
+            isLocked: isLocked,
+        };
+    
+        if (isLocked) {
+            const key = await generateKey();
+            const exportedKey = await exportKey(key);
+            localStorage.setItem(sectionId, JSON.stringify(exportedKey));
+    
+            const encryption = await encryptPassword(password, key);
+            const security = {
+                id: sectionId,
+                password: encryption,
+            }
+            chrome.runtime.sendMessage({ action: "saveCode", data: security }, response => {
+                //console.log("Message sent from add_section.js. Response:", response);
+            })
+        }
+        chrome.runtime.sendMessage({ action: "addSection", data: sectionData }, response => { // Send DATA
+            //console.log("Message sent from add_section.js. Response:", response);
+            window.close();
+        })
+        return;
+    });
+});
+
+/*
 document.addEventListener("DOMContentLoaded", function() {
     document.getElementById("toggle-checkbox").addEventListener("change", function() {
         const label = document.querySelector(".format");
@@ -72,13 +166,6 @@ document.addEventListener("DOMContentLoaded", function() {
             eyeIcon.src = "../assets/eye.png";
             passwordInput.type = 'password';
         }
-    });
-});
-
-document.addEventListener('DOMContentLoaded', function () {
-    const cancelButton = document.querySelector('.cancel-btn');
-    cancelButton.addEventListener('click', function () {
-        window.close();
     });
 });
 
@@ -131,3 +218,4 @@ document.querySelector('.save-btn').addEventListener("click", async () => {
     })
     return;
 });
+*/

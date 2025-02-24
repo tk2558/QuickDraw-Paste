@@ -234,6 +234,7 @@ function lockedSection(sectionData) {
 
   const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");
   addEntryBtn.style.visibility = "hidden";
+  addEntryBtn.style.display = "none"; 
   saveSections();
 }
 
