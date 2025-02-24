@@ -29,10 +29,14 @@ async function decryptPassword(encryptedObj, sectionId) {
 
 function getDataById(sectionId, callback) {
     chrome.storage.local.get(["sections"], (result) => {
-        if (result.sections) {
-            const sectionData = result.sections.find(sec => sec.id === sectionId);
-            callback(sectionData); 
-        }
+        const sectionData = result.sections.find(sec => sec.id === sectionId);
+        const sectionFormat = sectionData.format;
+        chrome.storage.local.get(sectionId, (lockedResults) => {
+            const { password, entries } = lockedResults[sectionId];
+            const sectionEntries = entries || []; 
+            console.log(`getDatabyID: ${sectionFormat} - ${sectionEntries} - ${typeof sectionEntries}`)
+            callback({ format: sectionFormat, entries: sectionEntries });
+        });
     });
 }
 
@@ -53,11 +57,11 @@ function checkPassword(sectionId, enteredPassword, callback) {
 
 function deletePassword(sectionId) {
     chrome.storage.local.remove(sectionId, () => { // Remove the associated password
-        //console.log(`Password for section ID ${sectionId} deleted.`);
+        //console.log(`${sectionId} deleted.`);
     });
 }
 
-function unlockSection(section, sectionId) {
+function unlockSection(section, sectionId, sectionData) {
     const lock = section.querySelector(".locked-section");
     const sectionContent = section.querySelector(".section-content");
     const addEntryBtn = section.querySelector(".add-entry-btn") ?? section.querySelector(".add-entry-btn-long");
@@ -67,22 +71,21 @@ function unlockSection(section, sectionId) {
     addEntryBtn.style.visibility = "visible";
     addEntryBtn.style.display = "block"; 
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button
-        createEntry(sectionContent, addEntryBtn , section.dataset.format);
+        createEntry(sectionContent, addEntryBtn, sectionData);
     });
     section.dataset.status = false;  // unlocked status
 
     getDataById(sectionId, (data) => {
         const format = data.format;
-        const entryData = data.entries;
-
+        const entryData =  Array.isArray(data.entries) ? data.entries : [];
         lock.remove();
-        entryData.forEach((entry) => // Restore Entries
+        entryData.forEach((entry) => {// Restore Entries
             restoreEntry(sectionContent, addEntryBtn, entry.name, entry.text, format)
-        );
+        });
     });
 }
 
-function relockSection(section) {
+function relockSection(section, sectionData) {
     const lockDiv = document.createElement("div"); // Recreate Lock Section
     const buttonClass = section.dataset.format === "single-line" ? "add-entry-btn" : "add-entry-btn-long";
     const sectionContent = section.querySelector(".section-content");
@@ -128,7 +131,7 @@ function relockSection(section) {
         const passwordInput = section.querySelector('.lock-password-input');
         checkPassword(section.id, passwordInput.value, (isMatch)=> {
             if (isMatch) {
-                unlockSection(section, section.id);
+                unlockSection(section, section.id, sectionData);
             } else {
                 enterBtn.classList.add("shake");
                 setTimeout(() => {  enterBtn.classList.remove("shake"); }, 300);    

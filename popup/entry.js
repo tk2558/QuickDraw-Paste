@@ -5,15 +5,43 @@ function saveSections() { // Save sections to Chrome Storage
             sectionName: section.querySelector(".section-title").textContent,
             isLocked: section.dataset.isLocked,
             format: section.dataset.format,
-            entries: Array.from(section.querySelectorAll(".entry, .entry-long")).map((entry) => ({
-                name: entry.querySelector(".entry-name").textContent,
-                text: entry.querySelector(".entry-text").value || entry.querySelector(".entry-text").innerText,
-            })),
+            entries: getSectionEntries(section),
         };
     });
     chrome.storage.local.set({ sections }, () => {
         //console.log("Sections saved: ", sections);
     });
+}
+
+function updateLockedSection(sectionId, entryName, entryText, locked) {
+  console.log(`updateLockedSection for ${sectionId}- ${typeof locked}`);
+  if (!locked || locked == "false") { return; }
+  console.log(`updating for ${sectionId}`);
+  chrome.storage.local.get(sectionId, (result) => {
+      const { password, entries } = result[sectionId];
+      console.log(`Current Entries in section ${sectionId}: `, { password: password, entries: entries });
+      entries.push({
+          name: entryName.trim(),
+          text: entryText,
+      });
+
+      chrome.storage.local.set({ [sectionId]: {password, entries}});
+  });
+}
+
+function getSectionEntries(section) {
+  let entries = [];
+  entries = Array.from(section.querySelectorAll(".entry, .entry-long")).map((entry) => {
+    const nameElement = entry.querySelector(".entry-name");
+    const textElement = entry.querySelector(".entry-text");
+    if (!nameElement || !textElement) return null;
+    if (!nameElement.textContent.trim() || !textElement.value.trim()) return null;
+    return {
+        name: nameElement.textContent.trim(),
+        text: textElement.value|| textElement.innerText,
+    };
+  }).filter(entry => entry !== null); // Remove null entries
+  return entries;
 }
 
 function restoreEntry(section, addButton, name, info, format) { 
@@ -83,11 +111,11 @@ function restoreEntry(section, addButton, name, info, format) {
 }
 
 
-function createEntry(section, addButton, format) { 
-    if (!section) return; //  Catch errors if section is null
-  
+function createEntry(sectionContent, addButton, sectionData) { 
+    if (!sectionContent) return; //  Catch errors if section is null
+    console.log(`Creating Entry: ${sectionData}`);
     const entryDiv = document.createElement("div");
-    if (format === "single-line") { entryDiv.classList.add("entry");}
+    if (sectionData.format === "single-line") { entryDiv.classList.add("entry");}
     else { entryDiv.classList.add("entry-long"); }
   
     // Bullet Icon
@@ -113,7 +141,7 @@ function createEntry(section, addButton, format) {
     confirmBtn.textContent = "✔";
     confirmBtn.style.color = "green";
   
-    if (format === "single-line") {
+    if (sectionData.format === "single-line") {
       const infoInput = document.createElement("input");
       infoInput.type = "text";
       infoInput.placeholder = "Enter Info (e.g., URL)";
@@ -121,7 +149,8 @@ function createEntry(section, addButton, format) {
   
       entryDiv.append(bulletIcon, nameInput, infoInput, deleteBtn, confirmBtn);
       confirmBtn.addEventListener("click", function () {
-        saveEntry(entryDiv, nameInput.value, infoInput.value, format);
+        saveEntry(entryDiv, nameInput.value, infoInput.value, sectionData.format);
+        updateLockedSection(sectionData.id, nameInput.value, infoInput.value, sectionData.isLocked)
       });
     } else {
         const infoInputArea = document.createElement("textarea");
@@ -134,11 +163,12 @@ function createEntry(section, addButton, format) {
     
         entryDiv.append(bulletIcon, nameInput, infoInputArea, deleteBtn, editBtn, confirmBtn);
         confirmBtn.addEventListener("click", function () {
-          saveEntry(entryDiv, nameInput.value, infoInputArea.value, format);
+          saveEntry(entryDiv, nameInput.value, infoInputArea.value, sectionData.format);
+          updateLockedSection(sectionData.id, nameInput.value, infoInputArea.value, sectionData.isLocked)
         });
     }
 
-    section.insertBefore(entryDiv, addButton); // Append to section above the "Add Entry" button
+    sectionContent.insertBefore(entryDiv, addButton); // Append to section above the "Add Entry" button
     deleteBtn.addEventListener("click", function () {
       entryDiv.remove();
     });
@@ -223,4 +253,4 @@ function saveEntry(entryDiv, name, info, format) {
     saveSections();
 }
 
-export { saveSections, restoreEntry, createEntry, saveEntry };
+export { updateLockedSection, saveSections, restoreEntry, createEntry, saveEntry };

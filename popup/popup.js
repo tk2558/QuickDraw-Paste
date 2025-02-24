@@ -1,6 +1,6 @@
 import { loadSections } from "./storage.js";
 import { checkPassword, deletePassword, unlockSection, relockSection } from "./security.js";
-import { saveSections, createEntry } from "./entry.js";
+import { saveSections, createEntry, updateLockedSection } from "./entry.js";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { // Listen for the new section data
   if (message.action === 'forwardData') {
@@ -29,7 +29,7 @@ document.addEventListener("DOMContentLoaded", () => {
   sections.forEach((section) => {
       section.draggable = true; // Enable dragging
       section.addEventListener("dragstart", (event) => {
-          event.dataTransfer.setData("text/plain", section.id); // Store dragged section ID
+          event.dataTransfer.setData("text/plain", section.id);
           section.classList.add("dragging");
       });
 
@@ -45,7 +45,6 @@ document.addEventListener("DOMContentLoaded", () => {
       return draggableElements.reduce((closest, child) => {
           const box = child.getBoundingClientRect();
           const offset = y - box.top - box.height / 2;
-
           return offset < 0 && offset > closest.offset ? { offset, element: child } : closest;
       }, { offset: Number.NEGATIVE_INFINITY }).element;
   }
@@ -53,10 +52,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const tumbleweed = document.querySelector(".project-icon");
   tumbleweed.addEventListener("click", () => {
       tumbleweed.classList.add("rolling");
-
-      // Remove class after animation completes to allow re-triggering
       setTimeout(() => {
-          tumbleweed.classList.remove("rolling");
+          tumbleweed.classList.remove("rolling"); // Remove class after animation completes to allow re-triggering
       }, 3000); // Same duration as animation
   });
 });
@@ -100,7 +97,7 @@ function createSection(sectionData) {
 
   newSection.draggable = true; // Enable dragging
   newSection.addEventListener("dragstart", (event) => {
-      event.dataTransfer.setData("text/plain", sectionId); // Store dragged section ID
+      event.dataTransfer.setData("text/plain", sectionId);
       newSection.classList.add("dragging");
   });
   newSection.addEventListener("dragend", () => {
@@ -122,9 +119,9 @@ function createSection(sectionData) {
       sectionContent.classList.toggle("hidden");
   });
 
-  const addEntryBtn = newSection.querySelector(".add-entry-btn") ??  newSection.querySelector(".add-entry-btn-long");
+  const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");
   addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button (Multi Line Version)
-      createEntry(sectionContent, addEntryBtn , sectionData.format);
+      createEntry(sectionContent, addEntryBtn, sectionData);
   });
   saveSections();
 }
@@ -196,7 +193,7 @@ function lockedSection(sectionData) {
   const lockBtn = newSection.querySelector(".lock-btn");
   lockBtn.addEventListener("click", () => { 
       if (newSection.dataset.status == "false") {
-        relockSection(newSection);
+        relockSection(newSection, sectionData);
       }   
       const lockedContent = newSection.querySelector(".locked-section");
       const sectionContent = newSection.querySelector(".section-content");
@@ -224,7 +221,7 @@ function lockedSection(sectionData) {
     const passwordInput = newSection.querySelector('.lock-password-input');
     checkPassword(newSection.id, passwordInput.value, (isMatch)=> {
       if (isMatch) {
-          unlockSection(newSection, newSection.id);
+          unlockSection(newSection, newSection.id, sectionData);
       } else {
           enterBtn.classList.add("shake");
           setTimeout(() => {  enterBtn.classList.remove("shake"); }, 300);    

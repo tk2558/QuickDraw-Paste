@@ -18,9 +18,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
   }
   if (message.action === "saveCode") {
-    const { id, password } = message.data;
+    const { id, password, entries } = message.data;
+    console.log("Saved Code Stored:", message.data);
     sendResponse({ status: "Received Code" });
-    chrome.storage.local.set({ [id]: {password}  });
+    chrome.storage.local.set({ [id]: {password, entries}  });
   }
 });
   

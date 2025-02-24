@@ -53,7 +53,7 @@ function restoreSections(sectionData) {
 
     newSection.draggable = true; // Enable dragging
     newSection.addEventListener("dragstart", (event) => {
-        event.dataTransfer.setData("text/plain", sectionId); // Store dragged section ID
+        event.dataTransfer.setData("text/plain", sectionId);
         newSection.classList.add("dragging");
     });
     newSection.addEventListener("dragend", () => {
@@ -82,7 +82,7 @@ function restoreSections(sectionData) {
     }); 
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button (Multi Line Version)
         const sectionContent = newSection.querySelector(".section-content");
-        createEntry(sectionContent, addEntryBtn , sectionData.format);
+        createEntry(sectionContent, addEntryBtn, sectionData);
     });
     if (!sectionData.entries.length) {  newSection.querySelector('.section-content').classList.toggle('hidden'); }
 }
@@ -134,7 +134,7 @@ function restoreLocked(sectionData) {
   
     newSection.draggable = true; // Enable dragging
     newSection.addEventListener("dragstart", (event) => {
-        event.dataTransfer.setData("text/plain", sectionId); // Store dragged section ID
+        event.dataTransfer.setData("text/plain", sectionId);
         newSection.classList.add("dragging");
     });
     newSection.addEventListener("dragend", () => {
@@ -155,7 +155,7 @@ function restoreLocked(sectionData) {
     const lockBtn = newSection.querySelector(".lock-btn");
     lockBtn.addEventListener("click", () => {
         if (newSection.dataset.status == "false") {
-            relockSection(newSection);
+            relockSection(newSection, sectionData);
         }
         const lockedContent = newSection.querySelector(".locked-section");
         const sectionContent = newSection.querySelector(".section-content");   
@@ -182,7 +182,7 @@ function restoreLocked(sectionData) {
         const passwordInput = newSection.querySelector('.lock-password-input');
         checkPassword(newSection.id, passwordInput.value, (isMatch)=> {
             if (isMatch) {
-                unlockSection(newSection, newSection.id);
+                unlockSection(newSection, newSection.id, sectionData);
             } else {
                 enterBtn.classList.add("shake");
                 setTimeout(() => {  enterBtn.classList.remove("shake"); }, 300);    

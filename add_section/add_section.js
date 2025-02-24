@@ -110,9 +110,10 @@ document.addEventListener('DOMContentLoaded', function () {
             const security = {
                 id: sectionId,
                 password: encryption,
+                entries: [],
             }
             chrome.runtime.sendMessage({ action: "saveCode", data: security }, response => {
-                //console.log("Message sent from add_section.js. Response:", response);
+                console.log("Message sent from add_section.js. Response:", response);
             })
         }
         chrome.runtime.sendMessage({ action: "addSection", data: sectionData }, response => { // Send DATA
