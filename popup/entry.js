@@ -14,17 +14,13 @@ function saveSections() { // Save sections to Chrome Storage
 }
 
 function updateLockedSection(sectionId, entryName, entryText, locked) {
-  console.log(`updateLockedSection for ${sectionId}- ${typeof locked}`);
   if (!locked || locked == "false") { return; }
-  console.log(`updating for ${sectionId}`);
   chrome.storage.local.get(sectionId, (result) => {
       const { password, entries } = result[sectionId];
-      console.log(`Current Entries in section ${sectionId}: `, { password: password, entries: entries });
       entries.push({
           name: entryName.trim(),
           text: entryText,
       });
-
       chrome.storage.local.set({ [sectionId]: {password, entries}});
   });
 }
@@ -113,7 +109,7 @@ function restoreEntry(section, addButton, name, info, format) {
 
 function createEntry(sectionContent, addButton, sectionData) { 
     if (!sectionContent) return; //  Catch errors if section is null
-    console.log(`Creating Entry: ${sectionData}`);
+    
     const entryDiv = document.createElement("div");
     if (sectionData.format === "single-line") { entryDiv.classList.add("entry");}
     else { entryDiv.classList.add("entry-long"); }

@@ -117,6 +117,7 @@ function createSection(sectionData) {
   const collapseBtn = newSection.querySelector(".collapse-btn");
   collapseBtn.addEventListener("click", () => {
       sectionContent.classList.toggle("hidden");
+      collapseBtn.textContent = sectionContent.classList.contains("hidden") ? "▼" : "▲";
   });
 
   const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");

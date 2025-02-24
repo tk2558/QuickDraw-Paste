@@ -34,7 +34,6 @@ function getDataById(sectionId, callback) {
         chrome.storage.local.get(sectionId, (lockedResults) => {
             const { password, entries } = lockedResults[sectionId];
             const sectionEntries = entries || []; 
-            console.log(`getDatabyID: ${sectionFormat} - ${sectionEntries} - ${typeof sectionEntries}`)
             callback({ format: sectionFormat, entries: sectionEntries });
         });
     });

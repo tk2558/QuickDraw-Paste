@@ -73,6 +73,7 @@ function restoreSections(sectionData) {
     collapseBtn.addEventListener("click", () => {
         const sectionContent = newSection.querySelector(".section-content");
         sectionContent.classList.toggle("hidden");
+        collapseBtn.textContent = sectionContent.classList.contains("hidden") ? "▼" : "▲";
     });
     
     const addEntryBtn = newSection.querySelector(".add-entry-btn") ??  newSection.querySelector(".add-entry-btn-long");
