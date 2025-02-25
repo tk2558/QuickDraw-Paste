@@ -1,6 +1,6 @@
 import { loadSections } from "./storage.js";
 import { checkPassword, deletePassword, unlockSection, relockSection } from "./security.js";
-import { saveSections, createEntry, updateLockedSection } from "./entry.js";
+import { saveSections, createEntry, revealAllEntry, unrevealAllEntry } from "./entry.js";
 
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => { // Listen for the new section data
   if (message.action === 'forwardData') {
@@ -56,6 +56,39 @@ document.addEventListener("DOMContentLoaded", () => {
           tumbleweed.classList.remove("rolling"); // Remove class after animation completes to allow re-triggering
       }, 3000); // Same duration as animation
   });
+
+  const switchElement = document.querySelector(".switch");
+  const blackoutButton = document.querySelector(".blackout-button");
+  const checkbox = document.querySelector(".cb");
+
+  chrome.storage.local.get("Blackout", (result) => { 
+    const hide = result.Blackout !== undefined ? result.Blackout : true; // Default to true if first time
+    checkbox.checked = hide; // Set checkbox state
+    if (checkbox.checked) { //console.log("on");
+      blackoutButton.style.backgroundColor = "black";
+      blackoutButton.style.color = "white";
+      container.dataset.blackout = "true";
+    } else { //console.log("off");
+      blackoutButton.style.backgroundColor = "white";
+      blackoutButton.style.color = "black";
+      container.dataset.blackout = "false";
+    }
+  });
+
+  switchElement.addEventListener("change", function () {
+      if (checkbox.checked) { //console.log("on");
+        blackoutButton.style.backgroundColor = "black";
+        blackoutButton.style.color = "white";
+        container.dataset.blackout = "true";
+        unrevealAllEntry(container);
+      } else { //console.log("off");
+        blackoutButton.style.backgroundColor = "white";
+        blackoutButton.style.color = "black";
+        container.dataset.blackout = "false";
+        revealAllEntry(container);
+      }
+      chrome.storage.local.set({ Blackout: checkbox.checked });
+    });
 });
 
 function createSection(sectionData) {

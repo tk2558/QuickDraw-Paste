@@ -25,6 +25,68 @@ function updateLockedSection(sectionId, entryName, entryText, locked) {
   });
 }
 
+function updateLockedEntry(sectionId, locked, allEntry) {
+  //console.log(`${sectionId}, ${allEntry}`) 
+  if (!locked || locked == "false") { return; }
+  let entries = [];
+  chrome.storage.local.get(sectionId, (result) => {
+    const { password, oldentries } = result[sectionId];
+    allEntry.forEach((entry) => {
+      const entryName = entry.querySelector(".entry-name");
+      const entryText = entry.querySelector(".entry-text");
+      console.log(`${entryName.textContent} : ${entryText.value}`)
+
+      entries.push({
+        name: entryName.textContent.trim(),
+        text: entryText.value || entryText.innerText,
+      });
+    });
+
+    chrome.storage.local.set({ [sectionId]: {password, entries}});
+  });
+}
+
+function revealAllEntry(containers) {
+  const allSections = containers.querySelectorAll(".section");
+  allSections.forEach((section) => { 
+    if (section.dataset.isLocked == "true") {
+      const sectionContent = section.querySelector(".section-content");
+      const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
+      allEntry.forEach((entry) => {
+        const entryText = entry.querySelector(".entry-text");
+        entryText.style.backgroundColor = "white";
+      });
+    }
+  });
+}
+
+function unrevealAllEntry(containers) {
+  const allSections = containers.querySelectorAll(".section");
+  allSections.forEach((section) => { 
+    if (section.dataset.isLocked == "true") {
+      const sectionContent = section.querySelector(".section-content");
+      const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
+      allEntry.forEach((entry) => {
+        const entryText = entry.querySelector(".entry-text");
+        entryText.style.backgroundColor = "black";
+        entryText.addEventListener("click", function () {
+          entryText.style.backgroundColor = "white";
+        });
+      });
+    }
+  });
+}
+
+function blackoutEntry(allEntry) {
+  allEntry.forEach((entry) => {
+    const entryText = entry.querySelector(".entry-text");
+    entryText.style.backgroundColor = "black";
+    entryText.addEventListener("click", function () {
+      entryText.style.backgroundColor = "white";
+    });
+  });
+}
+
 function getSectionEntries(section) {
   let entries = [];
   entries = Array.from(section.querySelectorAll(".entry, .entry-long")).map((entry) => {
@@ -34,14 +96,15 @@ function getSectionEntries(section) {
     if (!nameElement.textContent.trim() || !textElement.value.trim()) return null;
     return {
         name: nameElement.textContent.trim(),
-        text: textElement.value|| textElement.innerText,
+        text: textElement.value || textElement.innerText,
     };
   }).filter(entry => entry !== null); // Remove null entries
   return entries;
 }
 
-function restoreEntry(section, addButton, name, info, format) { 
+function restoreEntry(sectionContent, addButton, name, info, sectionData) { 
     const entryDiv = document.createElement("div");
+    const format = sectionData.format;
     if (format === "single-line") { entryDiv.classList.add("entry");}
     else { entryDiv.classList.add("entry-long"); }
 
@@ -62,6 +125,7 @@ function restoreEntry(section, addButton, name, info, format) {
                 <button class="edit-btn">✏️</button>
                 <button class="copy-btn">📋</button>
         `;
+
         entryDiv.querySelector(".edit-btn").addEventListener("click", function () { // Add edit functionality
             const entryName = entryDiv.querySelector(".entry-name");
             const entryText = entryDiv.querySelector(".entry-text");
@@ -82,12 +146,13 @@ function restoreEntry(section, addButton, name, info, format) {
                 entryName.style.border = "none";
                 entryText.setAttribute("readonly", "true");
                 this.textContent = "✏️"; // Revert back to edit icon
+                saveSections();
+                const allEntry = sectionContent.querySelectorAll(".entry-long");
+                updateLockedEntry(sectionData.id, sectionData.isLocked, allEntry);
             }
         });
     }
-    
-    section.insertBefore(entryDiv, addButton); // Append to section above the "Add Entry" button
-  
+    sectionContent.insertBefore(entryDiv, addButton); // Append to section above the "Add Entry" button
     entryDiv.querySelector(".delete-btn").addEventListener("click", function () { // Add delete functionality
       if (confirm(`Delete Entry: ${name}?`)) {
         const bullet = entryDiv.querySelector(".entry-icon");
@@ -145,7 +210,7 @@ function createEntry(sectionContent, addButton, sectionData) {
   
       entryDiv.append(bulletIcon, nameInput, infoInput, deleteBtn, confirmBtn);
       confirmBtn.addEventListener("click", function () {
-        saveEntry(entryDiv, nameInput.value, infoInput.value, sectionData.format);
+        saveEntry(entryDiv, nameInput.value, infoInput.value, sectionData.format, sectionContent);
         updateLockedSection(sectionData.id, nameInput.value, infoInput.value, sectionData.isLocked)
       });
     } else {
@@ -159,7 +224,7 @@ function createEntry(sectionContent, addButton, sectionData) {
     
         entryDiv.append(bulletIcon, nameInput, infoInputArea, deleteBtn, editBtn, confirmBtn);
         confirmBtn.addEventListener("click", function () {
-          saveEntry(entryDiv, nameInput.value, infoInputArea.value, sectionData.format);
+          saveEntry(entryDiv, nameInput.value, infoInputArea.value, sectionData.format, sectionContent);
           updateLockedSection(sectionData.id, nameInput.value, infoInputArea.value, sectionData.isLocked)
         });
     }
@@ -171,7 +236,7 @@ function createEntry(sectionContent, addButton, sectionData) {
 }
 
 
-function saveEntry(entryDiv, name, info, format) { 
+function saveEntry(entryDiv, name, info, format, sectionContent) { 
     if (!name.trim() || !info.trim()) {
         alert("Name and Info cannot be empty!");
         return;
@@ -200,7 +265,7 @@ function saveEntry(entryDiv, name, info, format) {
       entryDiv.querySelector(".edit-btn").addEventListener("click", function () { // Add edit functionality
         const entryName = entryDiv.querySelector(".entry-name");
         const entryText = entryDiv.querySelector(".entry-text");
-        const isEditing = entryName.contentEditable === "true"; // Check if  in edit mode
+        const isEditing = entryName.contentEditable === "true"; // Check if in edit mode
   
         if (!isEditing) {
             entryName.contentEditable = "true"; // Enable editing mode
@@ -217,6 +282,9 @@ function saveEntry(entryDiv, name, info, format) {
             entryName.style.border = "none";
             entryText.setAttribute("readonly", "true");
             this.textContent = "✏️"; // Revert back to edit icon
+            saveSections();
+            const allEntry = sectionContent.querySelectorAll(".entry-long");
+            updateLockedEntry(sectionData.id, sectionData.isLocked, allEntry);
         }
       });
     }
@@ -249,4 +317,4 @@ function saveEntry(entryDiv, name, info, format) {
     saveSections();
 }
 
-export { updateLockedSection, saveSections, restoreEntry, createEntry, saveEntry };
+export { updateLockedSection, saveSections, restoreEntry, createEntry, saveEntry, blackoutEntry, revealAllEntry, unrevealAllEntry };

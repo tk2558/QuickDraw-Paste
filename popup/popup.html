@@ -16,13 +16,23 @@
 
         <div class ="section-container"></div>
         
-        </div>
-        <div class="divider"></div>
+    </div>
+    <div class="divider"></div>
         <div class="footer-buttons">
-            <!-- Left Side: Add Section Button -->
             <button class="add-section-btn">Add Section</button>
+            <div class="blackout-tooltip-container">
+                <button aria-describedby="blackout-tooltip" class="blackout-button">Blackout Mode:</button>
+                <div role="tooltip" id="blackout-tooltip" class="blackout-tooltip">Blackout mode will hide text entries in locked sections from view until clicked</div>
             </div>
+            <label class="switch">
+                <input class="cb" type="checkbox" checked/>
+                <span class="toggle">
+                  <span class="left">off</span>
+                  <span class="right">on</span>
+                </span>
+              </label>
         </div>
+    </div>
     </div>
 </body>
 </html>

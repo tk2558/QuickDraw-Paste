@@ -1,4 +1,4 @@
-import { restoreEntry, createEntry } from "./entry.js";
+import { restoreEntry, createEntry, blackoutEntry } from "./entry.js";
 
 async function importKey(keyArray) {
     return await crypto.subtle.importKey(
@@ -72,15 +72,22 @@ function unlockSection(section, sectionId, sectionData) {
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button
         createEntry(sectionContent, addEntryBtn, sectionData);
     });
-    section.dataset.status = false;  // unlocked status
+    section.dataset.status = false;
 
     getDataById(sectionId, (data) => {
         const format = data.format;
         const entryData =  Array.isArray(data.entries) ? data.entries : [];
         lock.remove();
-        entryData.forEach((entry) => {// Restore Entries
-            restoreEntry(sectionContent, addEntryBtn, entry.name, entry.text, format)
+        entryData.forEach((entry) => { // Restore Entries
+            restoreEntry(sectionContent, addEntryBtn, entry.name, entry.text, sectionData)
         });
+        const container = document.querySelector(".section-container");
+        //console.log(`blacking out entries: ${container.dataset.blackout == "true"}`);
+        if (container.dataset.blackout == "true") { 
+            const getEntries = format === "single-line" ? ".entry" : ".entry-long";
+            const allEntry = section.querySelectorAll(`${getEntries}`);
+            blackoutEntry(allEntry); 
+        }
     });
 }
 
@@ -141,7 +148,7 @@ function relockSection(section, sectionData) {
     const addEntryBtn = section.querySelector(".add-entry-btn") ?? section.querySelector(".add-entry-btn-long");
     addEntryBtn.style.visibility = "hidden";
     addEntryBtn.style.display = "none"; 
-    section.dataset.status = true;  // unlocked status
+    section.dataset.status = true; 
 }
 
 // Export functions for use in storage.js & popup.js

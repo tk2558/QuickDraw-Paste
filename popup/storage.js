@@ -79,7 +79,7 @@ function restoreSections(sectionData) {
     const addEntryBtn = newSection.querySelector(".add-entry-btn") ??  newSection.querySelector(".add-entry-btn-long");
     sectionData.entries.forEach((entry) => { // Restore Entries
         const sectionContent = newSection.querySelector(".section-content");
-        restoreEntry(sectionContent, addEntryBtn , entry.name, entry.text, sectionData.format)
+        restoreEntry(sectionContent, addEntryBtn , entry.name, entry.text, sectionData)
     }); 
     addEntryBtn.addEventListener("click", () => { // Add event listener for Add Entry button (Multi Line Version)
         const sectionContent = newSection.querySelector(".section-content");
