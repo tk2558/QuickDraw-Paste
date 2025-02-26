@@ -299,6 +299,19 @@ button:hover {
   animation: spin360 1s ease-in-out;
 }
 
+@keyframes flip360 {
+  from {
+    transform: rotateY(0deg);
+  }
+  to {
+    transform: rotateY(360deg);
+  }
+}
+
+.button-flip {
+  animation: flip360 1.25s ease-in-out;
+}
+
 @keyframes roll-across {
   0% {
       transform: translateX(0) rotate(0deg);
@@ -329,6 +342,13 @@ button:hover {
   animation: shake 0.3s ease-in-out;
 }
 
+@keyframes expose {
+  100% { background: white; }
+}
+
+.expose {
+  animation: expose .95s ease-in-out;
+}
 
 /* The switch - the box around the slider */
 .switch {

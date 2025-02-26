@@ -144,7 +144,12 @@ function relockSection(section, sectionData) {
             }
         });
     });
-
+    section.querySelector(".lock-password-input").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission or unwanted behavior
+            enterBtn.click(); // Simulate a click on the "Enter" button
+        }
+    });
     const addEntryBtn = section.querySelector(".add-entry-btn") ?? section.querySelector(".add-entry-btn-long");
     addEntryBtn.style.visibility = "hidden";
     addEntryBtn.style.display = "none"; 

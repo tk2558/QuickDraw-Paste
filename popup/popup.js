@@ -88,6 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
         revealAllEntry(container);
       }
       chrome.storage.local.set({ Blackout: checkbox.checked });
+      checkbox.disabled = true;
+      setTimeout(function(){
+        checkbox.disabled = false;
+      },1000);
     });
 });
 
@@ -261,7 +265,14 @@ function lockedSection(sectionData) {
           setTimeout(() => {  enterBtn.classList.remove("shake"); }, 300);    
       }
     });
-  });  
+  });
+
+  newSection.querySelector(".lock-password-input").addEventListener("keypress", function (event) {
+    if (event.key === "Enter") {
+        event.preventDefault(); // Prevent form submission or unwanted behavior
+        enterBtn.click(); // Simulate a click on the "Enter" button
+    }
+  });
 
   const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");
   addEntryBtn.style.visibility = "hidden";

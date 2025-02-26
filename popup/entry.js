@@ -54,7 +54,11 @@ function revealAllEntry(containers) {
       const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
       allEntry.forEach((entry) => {
         const entryText = entry.querySelector(".entry-text");
-        entryText.style.backgroundColor = "white";
+        entryText.classList.add("expose");
+        entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+          entryText.classList.remove("expose");
+          entryText.style.backgroundColor = "white";
+        });
       });
     }
   });
@@ -70,7 +74,11 @@ function unrevealAllEntry(containers) {
         const entryText = entry.querySelector(".entry-text");
         entryText.style.backgroundColor = "black";
         entryText.addEventListener("click", function () {
-          entryText.style.backgroundColor = "white";
+          entryText.classList.add("expose");
+          entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+            entryText.classList.remove("expose");
+            entryText.style.backgroundColor = "white";
+          });
         });
       });
     }
@@ -82,7 +90,11 @@ function blackoutEntry(allEntry) {
     const entryText = entry.querySelector(".entry-text");
     entryText.style.backgroundColor = "black";
     entryText.addEventListener("click", function () {
-      entryText.style.backgroundColor = "white";
+      entryText.classList.add("expose");
+      entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+        entryText.classList.remove("expose");
+        entryText.style.backgroundColor = "white";
+      });
     });
   });
 }
@@ -105,6 +117,7 @@ function getSectionEntries(section) {
 function restoreEntry(sectionContent, addButton, name, info, sectionData) { 
     const entryDiv = document.createElement("div");
     const format = sectionData.format;
+
     if (format === "single-line") { entryDiv.classList.add("entry");}
     else { entryDiv.classList.add("entry-long"); }
 
@@ -162,12 +175,19 @@ function restoreEntry(sectionContent, addButton, name, info, sectionData) {
         setTimeout(() => { // Wait for the animation to finish before removing the entry
             entryDiv.remove();
             saveSections();
+            const allEntry = format === "single-line" ? sectionContent.querySelectorAll(".entry") : sectionContent.querySelectorAll(".entry-long");
+            updateLockedEntry(sectionData.id, sectionData.isLocked, allEntry);
         }, 500);
       }
     });
    
-    entryDiv.querySelector(".copy-btn").addEventListener("click", function () { // Add copy functionality
+    const copyBtn = entryDiv.querySelector(".copy-btn");
+    copyBtn.addEventListener("click", function () { // Add copy functionality
       navigator.clipboard.writeText(info);
+      copyBtn.classList.add("button-flip"); // Trigger the button FLIP MOVE
+      copyBtn.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+        copyBtn.classList.remove("button-flip");
+      });
     });
 }
 
@@ -210,7 +230,7 @@ function createEntry(sectionContent, addButton, sectionData) {
   
       entryDiv.append(bulletIcon, nameInput, infoInput, deleteBtn, confirmBtn);
       confirmBtn.addEventListener("click", function () {
-        saveEntry(entryDiv, nameInput.value, infoInput.value, sectionData.format, sectionContent);
+        saveEntry(entryDiv, nameInput.value, infoInput.value, sectionData, sectionContent);
         updateLockedSection(sectionData.id, nameInput.value, infoInput.value, sectionData.isLocked)
       });
     } else {
@@ -224,7 +244,7 @@ function createEntry(sectionContent, addButton, sectionData) {
     
         entryDiv.append(bulletIcon, nameInput, infoInputArea, deleteBtn, editBtn, confirmBtn);
         confirmBtn.addEventListener("click", function () {
-          saveEntry(entryDiv, nameInput.value, infoInputArea.value, sectionData.format, sectionContent);
+          saveEntry(entryDiv, nameInput.value, infoInputArea.value, sectionData, sectionContent);
           updateLockedSection(sectionData.id, nameInput.value, infoInputArea.value, sectionData.isLocked)
         });
     }
@@ -236,13 +256,13 @@ function createEntry(sectionContent, addButton, sectionData) {
 }
 
 
-function saveEntry(entryDiv, name, info, format, sectionContent) { 
+function saveEntry(entryDiv, name, info, sectionData, sectionContent) { 
     if (!name.trim() || !info.trim()) {
         alert("Name and Info cannot be empty!");
         return;
     }
   
-    if (format === "single-line") {
+    if (sectionData.format === "single-line") {
       entryDiv.innerHTML = `
           <img src="../assets/bullet.png" alt="Icon" class="entry-icon">
           <span class="entry-name">${name}</span>
@@ -302,8 +322,13 @@ function saveEntry(entryDiv, name, info, format, sectionContent) {
       }
     });
    
-    entryDiv.querySelector(".copy-btn").addEventListener("click", function () { // Add copy functionality
+    const copyBtn = entryDiv.querySelector(".copy-btn");
+    copyBtn.addEventListener("click", function () { // Add copy functionality
       navigator.clipboard.writeText(info);
+      copyBtn.classList.add("button-flip"); // Trigger the button FLIP MOVE
+      copyBtn.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+        copyBtn.classList.remove("button-flip");
+      });
     });
     
     // ANIMATION

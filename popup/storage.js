@@ -190,7 +190,12 @@ function restoreLocked(sectionData) {
             }
         });
     });
-
+    newSection.querySelector(".lock-password-input").addEventListener("keypress", function (event) {
+        if (event.key === "Enter") {
+            event.preventDefault(); // Prevent form submission or unwanted behavior
+            enterBtn.click(); // Simulate a click on the "Enter" button
+        }
+    });
     const addEntryBtn = newSection.querySelector(".add-entry-btn") ?? newSection.querySelector(".add-entry-btn-long");
     newSection.querySelector('.section-content').classList.toggle('hidden');
     newSection.querySelector('.locked-section').classList.toggle('hidden');
