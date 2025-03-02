@@ -101,6 +101,7 @@ h2 {
     font-size: 14px;
     font-weight: bold;
     margin-left: 10px;
+    margin-top: 5px;
 }
 
 .password-container {
@@ -187,6 +188,7 @@ button {
     cursor: pointer;
     display: block;
     height: 16px;
+    margin-top: 5px;
 }
 
 .line {

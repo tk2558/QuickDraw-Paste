@@ -49,9 +49,10 @@ function updateLockedEntry(sectionId, locked, allEntry) {
 function revealAllEntry(containers) {
   const allSections = containers.querySelectorAll(".section");
   allSections.forEach((section) => { 
-    if (section.dataset.isLocked == "true") {
+    //if (section.dataset.isLocked == "true") {
       const sectionContent = section.querySelector(".section-content");
-      const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
+      const allEntry = section.dataset.format === "single-line" ? sectionContent.querySelectorAll(".entry") : sectionContent.querySelectorAll(".entry-long");
+      //const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
       allEntry.forEach((entry) => {
         const entryText = entry.querySelector(".entry-text");
         entryText.classList.add("expose");
@@ -60,16 +61,17 @@ function revealAllEntry(containers) {
           entryText.style.backgroundColor = "white";
         });
       });
-    }
+    //}
   });
 }
 
 function unrevealAllEntry(containers) {
   const allSections = containers.querySelectorAll(".section");
   allSections.forEach((section) => { 
-    if (section.dataset.isLocked == "true") {
+    //if (section.dataset.isLocked == "true") {
       const sectionContent = section.querySelector(".section-content");
-      const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
+      const allEntry = section.dataset.format === "single-line" ? sectionContent.querySelectorAll(".entry") : sectionContent.querySelectorAll(".entry-long");
+      //const allEntry = sectionContent.querySelectorAll(".entry") ?? sectionContent.querySelectorAll(".entry-long");
       allEntry.forEach((entry) => {
         const entryText = entry.querySelector(".entry-text");
         entryText.style.backgroundColor = "black";
@@ -81,7 +83,7 @@ function unrevealAllEntry(containers) {
           });
         });
       });
-    }
+    //}
   });
 }
 
@@ -189,6 +191,19 @@ function restoreEntry(sectionContent, addButton, name, info, sectionData) {
         copyBtn.classList.remove("button-flip");
       });
     });
+
+    const container = document.querySelector(".section-container");
+    if (container.dataset.blackout == "true") {      
+      const entryText = entryDiv.querySelector(".entry-text");
+      entryText.style.backgroundColor = "black";
+      entryText.addEventListener("click", function () {
+        entryText.classList.add("expose");
+        entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+          entryText.classList.remove("expose");
+          entryText.style.backgroundColor = "white";
+        });
+      });
+    }
 }
 
 
@@ -340,6 +355,19 @@ function saveEntry(entryDiv, name, info, sectionData, sectionContent) {
         });
     }
     saveSections();
+
+    const container = document.querySelector(".section-container");
+    if (container.dataset.blackout == "true") {
+      const entryText = entryDiv.querySelector(".entry-text");
+      entryText.style.backgroundColor = "black";
+      entryText.addEventListener("click", function () {
+        entryText.classList.add("expose");
+        entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+          entryText.classList.remove("expose");
+          entryText.style.backgroundColor = "white";
+        });
+      });
+    }
 }
 
 export { updateLockedSection, saveSections, restoreEntry, createEntry, saveEntry, blackoutEntry, revealAllEntry, unrevealAllEntry };

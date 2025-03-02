@@ -82,7 +82,6 @@ function unlockSection(section, sectionId, sectionData) {
             restoreEntry(sectionContent, addEntryBtn, entry.name, entry.text, sectionData)
         });
         const container = document.querySelector(".section-container");
-        //console.log(`blacking out entries: ${container.dataset.blackout == "true"}`);
         if (container.dataset.blackout == "true") { 
             const getEntries = format === "single-line" ? ".entry" : ".entry-long";
             const allEntry = section.querySelectorAll(`${getEntries}`);

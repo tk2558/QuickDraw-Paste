@@ -24,6 +24,43 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   loadSections();
+  const switchElement = document.querySelector(".switch");
+  const blackoutButton = document.querySelector(".blackout-button");
+  const checkbox = document.querySelector(".cb");
+
+  chrome.storage.local.get("Blackout", (result) => { 
+    const hide = result.Blackout !== undefined ? result.Blackout : true; // Default to true if first time
+    checkbox.checked = hide; // Set checkbox state
+    if (checkbox.checked) { //console.log("on");
+      blackoutButton.style.backgroundColor = "black";
+      blackoutButton.style.color = "white";
+      container.dataset.blackout = "true";
+      unrevealAllEntry(container);
+    } else { //console.log("off");
+      blackoutButton.style.backgroundColor = "white";
+      blackoutButton.style.color = "black";
+      container.dataset.blackout = "false";
+    }
+  });
+
+  switchElement.addEventListener("change", function () {
+      if (checkbox.checked) { //console.log("on");
+        blackoutButton.style.backgroundColor = "black";
+        blackoutButton.style.color = "white";
+        container.dataset.blackout = "true";
+        unrevealAllEntry(container);
+      } else { //console.log("off");
+        blackoutButton.style.backgroundColor = "white";
+        blackoutButton.style.color = "black";
+        container.dataset.blackout = "false";
+        revealAllEntry(container);
+      }
+      chrome.storage.local.set({ Blackout: checkbox.checked });
+      checkbox.disabled = true;
+      setTimeout(function(){
+        checkbox.disabled = false;
+      },1000);
+  });
 
   const sections = document.querySelectorAll(".section");
   sections.forEach((section) => {
@@ -56,43 +93,6 @@ document.addEventListener("DOMContentLoaded", () => {
           tumbleweed.classList.remove("rolling"); // Remove class after animation completes to allow re-triggering
       }, 3000); // Same duration as animation
   });
-
-  const switchElement = document.querySelector(".switch");
-  const blackoutButton = document.querySelector(".blackout-button");
-  const checkbox = document.querySelector(".cb");
-
-  chrome.storage.local.get("Blackout", (result) => { 
-    const hide = result.Blackout !== undefined ? result.Blackout : true; // Default to true if first time
-    checkbox.checked = hide; // Set checkbox state
-    if (checkbox.checked) { //console.log("on");
-      blackoutButton.style.backgroundColor = "black";
-      blackoutButton.style.color = "white";
-      container.dataset.blackout = "true";
-    } else { //console.log("off");
-      blackoutButton.style.backgroundColor = "white";
-      blackoutButton.style.color = "black";
-      container.dataset.blackout = "false";
-    }
-  });
-
-  switchElement.addEventListener("change", function () {
-      if (checkbox.checked) { //console.log("on");
-        blackoutButton.style.backgroundColor = "black";
-        blackoutButton.style.color = "white";
-        container.dataset.blackout = "true";
-        unrevealAllEntry(container);
-      } else { //console.log("off");
-        blackoutButton.style.backgroundColor = "white";
-        blackoutButton.style.color = "black";
-        container.dataset.blackout = "false";
-        revealAllEntry(container);
-      }
-      chrome.storage.local.set({ Blackout: checkbox.checked });
-      checkbox.disabled = true;
-      setTimeout(function(){
-        checkbox.disabled = false;
-      },1000);
-    });
 });
 
 function createSection(sectionData) {
