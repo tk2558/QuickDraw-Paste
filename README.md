@@ -11,14 +11,6 @@ QuickDraw Paste is a Chrome extension that helps users quickly save and paste es
 2. Open `chrome://extensions/` in your browser.
 3. Enable "Developer mode" and load the unpacked extension.
 
-## 📸 Screenshots
+## 📸 Basic Demo
 - **Basic Live Demo**
 ![Demo](https://github.com/tk2558/QuickDraw-Paste/blob/main/screenshots/basic_demo.gif)
-
-
-- **Basic Home**
-![Home](https://github.com/tk2558/QuickDraw-Paste/blob/main/screenshots/Basic_Home.JPG)
-
-
-- **Add Section**
-![Add](https://github.com/tk2558/QuickDraw-Paste/blob/main/screenshots/Add_Section.JPG)
