@@ -301,14 +301,16 @@ function saveEntry(entryDiv, name, info, sectionData, sectionContent) {
         const entryName = entryDiv.querySelector(".entry-name");
         const entryText = entryDiv.querySelector(".entry-text");
         const isEditing = entryName.contentEditable === "true"; // Check if in edit mode
-  
+        const container = document.querySelector(".section-container");
+
         if (!isEditing) {
             entryName.contentEditable = "true"; // Enable editing mode
             entryName.style.backgroundColor = "white"; 
             entryName.style.border = "1px solid #ccc";
+            entryText.style.backgroundColor = "white";
             entryText.removeAttribute("readonly");
             entryText.focus();
-  
+
             this.textContent = "✔"; // Change edit button to confirm
             this.style.color = "green";
         } else {
@@ -320,6 +322,17 @@ function saveEntry(entryDiv, name, info, sectionData, sectionContent) {
             saveSections();
             const allEntry = sectionContent.querySelectorAll(".entry-long");
             updateLockedEntry(sectionData.id, sectionData.isLocked, allEntry);
+            
+            if (container.dataset.blackout == "true") {
+              entryText.style.backgroundColor = "black";
+              entryText.addEventListener("click", function () {
+                entryText.classList.add("expose");
+                entryText.addEventListener("animationend", function () { // Remove the class after the animation completes to allow re-triggering in the future
+                  entryText.classList.remove("expose");
+                  entryText.style.backgroundColor = "white";
+                });
+              });
+            }
         }
       });
     }
